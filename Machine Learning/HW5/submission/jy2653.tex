@@ -1,0 +1,316 @@
+\documentclass[twoside,11pt]{homework}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{lipsum}
+\usepackage{indentfirst}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{makecell}
+\usepackage{indentfirst}
+\usepackage{bbm, dsfont}
+
+\coursename{COMS 4771 Machine Learning (Spring 2015)} % DON'T CHANGE THIS
+
+\studname{Jingwei Yang}    % YOUR NAME GOES HERE
+\studmail{jy2653@columbia.edu}% YOUR UNI GOES HERE
+\hwNo{5}                   % THE HOMEWORK NUMBER GOES HERE
+\collab{pp2526,yd2300}   % THE UNI'S OF STUDENTS YOU DISCUSSED WITH
+\begin{document}
+\maketitle
+
+\section*{Problem 1}
+\indent
+Suppose we have one item $i$; $\pmb X_i = (X_{i,1}, X_{i,2}, ... , X_{i,n})$ and $Y_i$. Let $\pmb x_i = (x_{i, 1}, x_{i,2}, ..., x_{i, n}) \in \{0, 1\} ^ n$ be the observed responses for item $i$. Using Jensen's inequality, we could have
+\begin{align*}
+\ln Pr_\theta(\pmb X_i = x_i) & = \ln \sum_{y\in \{0, 1\}} q(y)  \frac{Pr_\theta(\pmb X_i =  \pmb x_i \wedge Y_i = y )}{q(y)} \\
+& \geq \ln \sum_{y\in \{0, 1\}} q(y) \ln Pr_{\theta} (\pmb X = \pmb x_i \wedge Y_i = y) - \sum_{y\in \{0, 1\}} q(y) \ln q(y)
+\end{align*}
+
+And for each $y \in \{ 0, 1\}$, the "complete log-likelihood" is 
+
+\begin{align*}
+\ln Pr_\theta(\pmb X_i =  \pmb x_i \wedge Y_i = y )
+&= (1-y) [\ln (1 - \pi_i) + \sum_{j =1}^{n} (1 - x_{i, j})\ln p_j + x_{i,j} \ln (1 - p_j)] \\
++ &y [\ln \pi_i + \sum_{j =1}^{n}x_{i, j}\ln r_j + (1-x_{i,j}) \ln (1 - r_j)] 
+\end{align*}
+
+Suppose $q_i = Pr_\theta(Y_i = 1 | \pmb X_i = \pmb x_i )$, by independence and Bayes' rule, we have
+\begin{align*} 
+q_i & = Pr_\theta(Y_i = 1 | \pmb X_i = \pmb x_i ) \\ 
+& = \frac {\pi _i  \prod _ {j =1} ^ n  r _ j ^ {x_{i, j}}  (1-r_j)^{1- x_{i,j}}}  {\pi _i  \prod _ {j =1} ^ n  r _ j ^ {x_{i, j}}  (1-r_j)^{1- x_{i,j}} + (1 - \pi _i)  \prod _ {j =1} ^ n  p _ j ^ {1 - x_{i, j}}  (1-p_j)^{x_{i,j}}}\\
+\end{align*}
+
+When $q(y) = q_i ^ y (1 - q_i) ^ {1 - y}$, we have 
+
+\begin{align*}
+\sum _ { y \in {0 , 1}}  q (y) \ln Pr_\theta(\pmb X = \pmb x \wedge  Y =  y )
+&= (1-q_i) [\ln (1 - \pi_i) + \sum_{j =1}^{n} (1 - x_{i, j})\ln p_j + x_{i,j} \ln (1 - p_j)] \\
++ & q_i [\ln \pi_i + \sum_{j =1}^{n}x_{i, j}\ln r_j + (1-x_{i,j}) \ln (1 - r_j)] 
+\end{align*}
+
+Therefore, the E step is: 
+
+\begin{align*} 
+q_i & = \frac {\pi _i  \prod _ {j =1} ^ n  r _ j ^ {x_{i, j}}  (1-r_j)^{1- x_{i,j}}}  {\pi _i  \prod _ {j =1} ^ n  r _ j ^ {x_{i, j}}  (1-r_j)^{1- x_{i,j}} + (1 - \pi _i)  \prod _ {j =1} ^ n  p _ j ^ {1 - x_{i, j}}  (1-p_j)^{x_{i,j}}}\\
+\end{align*}
+
+After computing the value of $q_i$, consider all $m$, we could get $L_{LB} ( \pmb \theta)$ in following form. 
+\begin{align*}
+L_{LB} ( \pmb \theta) &=  \sum _{ i = 1}^ m (1-q_i) [\ln (1 - \pi_i) + \sum_{j =1}^{n} (1 - x_{i, j})\ln p_j + x_{i,j} \ln (1 - p_j)] \\
++ & q_i [\ln \pi_i + \sum_{j =1}^{n}x_{i, j}\ln r_j + (1-x_{i,j}) \ln (1 - r_j)] 
+\end{align*}
+
+Take gradient of $p_j$, we have
+\begin{align*}
+\nabla_{p_j} L_{LB}( \pmb \theta)= \sum _ {i = 1} ^ {m} (1 - q_i) (\frac {1 - x_{i, j}} { p_{j}}   - \frac {x_{i, j}} {1 - p_{j}})
+\end{align*}
+
+To maximize $L_{LB}( \pmb \theta)$, we assign $\nabla_{p_j} L_{LB}( \pmb \theta)$ to be 0, thus we have 
+\begin{align*}
+\nabla_{p_j} L_{LB} ( \pmb \theta) = \sum _ {i = 1} ^ {m} (1 - q_i) (\frac {1 - x_{i, j}} { p_{j}}   - \frac {x_{i, j}} {1 - p_{j}}) = 0
+\end{align*}
+
+$\implies$
+\begin{align*}
+\sum _ {i = 1} ^ {m} (1 - q_i) (({1 - x_{i, j}})(1 - p_{j}) - {x_{i, j}} {p_{j}}) = 0
+\end{align*}
+
+$\implies$
+\begin{align*}
+\sum _ {i = 1} ^ {m} (1 - q_i) (1 - p_{j} - x_{i, j})= 0
+\end{align*}
+
+$\implies$
+\begin{align*}
+\sum _ {i = 1} ^ {m} (1 - q_i)(1 - x_{i, j}) - p_{j}(1-q_i)= 0
+\end{align*}
+
+$\implies$
+\begin{align*}
+p_j\sum _ {i = 1} ^ {m} (1 - q_i) =  \sum _ {i = 1} ^ {m} (1 - q_i)(1 - x_{i, j}) 
+\end{align*}
+
+$\implies$
+\begin{align*}
+p_j = \frac  {\sum _ {i = 1} ^ {m} (1 - q_i)(1 - x_{i, j})} {\sum _ {i = 1} ^ {m} (1 - q_i)}
+\end{align*}
+
+Take gradient of $r_j$, we have
+\begin{align*}
+\nabla_{r_j} L_{LB}( \pmb \theta)= \sum _ {i = 1} ^ {m} q_i ( \frac {x _ {i, j}}{ r_j}  + \frac {x_{i, j} - 1} {1 - r_j } )
+\end{align*}
+
+
+To maximize $L_{LB}(\pmb \theta)$, we assign $\nabla_{r_j} L_{LB}( \pmb \theta)$ to be 0, thus we have 
+\begin{align*}
+\nabla_{p_j} L_{LB} ( \pmb \theta) = \sum _ {i = 1} ^ {m} q_i ( \frac {x _ {i, j}}{ r_j}  + \frac {x_{i, j} - 1} {1 - r_j }) = 0
+\end{align*}
+
+$\implies$
+\begin{align*}
+\sum _ {i = 1} ^ {m} q_i ( x _ {i, j}(1 - r_j ) + ({x_{i, j} - 1}){ r_j} ) = 0
+\end{align*}
+
+
+$\implies$
+\begin{align*}
+\sum _ {i = 1} ^ {m} q_i (x _ {i, j} -  r_j x _ {i, j} + r_j x _ {i, j}  - r_j ) = 0
+\end{align*}
+
+
+$\implies$
+\begin{align*}
+\sum _ {i = 1} ^ {m} q_i (x _ {i, j} - r_j ) = 0
+\end{align*}
+
+
+$\implies$
+\begin{align*}
+r_j \sum _ {i = 1} ^ {m} q_i  = \sum _ {i = 1} ^ {m} q_i x _ {i, j} 
+\end{align*}
+
+
+$\implies$
+\begin{align*}
+r_j =  \frac {\sum _ {i = 1} ^ {m} q_i x _ {i, j} } {\sum _ {i = 1} ^ {m} q_i }
+\end{align*}
+
+
+Therefore, we have following EM algorithm for this problem. \\
+${E}$ step :
+
+\begin{align*} 
+q_i & = \frac {\pi _i  \prod _ {j =1} ^ n  r _ j ^ {x_{i, j}}  (1-r_j)^{1- x_{i,j}}}  {\pi _i  \prod _ {j =1} ^ n  r _ j ^ {x_{i, j}}  (1-r_j)^{1- x_{i,j}} + (1 - \pi _i)  \prod _ {j =1} ^ n  p _ j ^ {1 - x_{i, j}}  (1-p_j)^{x_{i,j}}}\\
+\end{align*}
+for all $i \in [m]$
+
+${M}$  step :
+\begin{align*}
+p_j = \frac  {\sum _ {i = 1} ^ {m} (1 - q_i)(1 - x_{i, j})} {\sum _ {i = 1} ^ {m} (1 - q_i)}
+\end{align*}
+
+\begin{align*}
+r_j =  \frac {\sum _ {i = 1} ^ {m} q_i x _ {i, j} } {\sum _ {i = 1} ^ {m} q_i }
+\end{align*}
+
+
+
+\section*{Problem 2}
+\indent
+(a) \\ \indent
+Solution : $p_1 =  \frac {1}{15}, p_2 = \frac {1}{15}, p_3 = \frac {1}{15}, p_4 = \frac{1}{5} , p_5 = \frac{3}{10}, p_6 =  \frac{3}{10}$ \\
+
+According to the description of problem, we could have following equations. 
+\begin{align*}
+p_4 &= 0.2 \\
+p_1 + p_2 + p_3  &= 0.2 \\
+p_5 + p_6 &= 0.6
+\end{align*}
+
+$\implies$
+\begin{align*}
+p_5 = 0.6 - p_6 \\
+p_1 = 0.2 - p_2 - p_3
+\end{align*}
+
+Thus, we could replace $p_5$ and $p_1$in our entropy calculation. 
+\begin{align*}
+H(P) =& \sum _{x \in \{1, ..., 6\}} - P(x) \ln P(x) \\
+ = & - (0.2 - p_2 - p_3) \ln (0.2 - p_2 - p_3)  - p2\ln p2 - p3 \ln p3  \\
+& - 0.2 \ln 0.2 - (0.6 - p_6) \ln (0.6 - p_6) - p_6 \ln p_6
+\end{align*}
+
+Take gradient of $p_6$, we have 
+\begin{align*}
+\nabla_{p_6}H(P) = \ln(0.6 - p_6) - \ln p_6
+\end{align*}
+
+To maximize $H(P)$, we assign $\nabla_{p_6}H(P)$ to be 0, thus we have 
+\begin{align*}
+p_6 = 0.3 \\
+p_5 = 0.3
+\end{align*}
+
+Also take gradient of $p_2$, we have 
+\begin{align*}
+\nabla_{p_2}H(P) = \ln(0.2 - p_2 - p_3) - \ln p_2
+\end{align*}
+
+To maximize $H(P)$, we assign $\nabla_{p_2}H(P)$ to be 0, thus we have 
+\begin{align*}
+p_2 = \frac {0.2 - p_3}{2}
+\end{align*}
+
+Replace $p_2$ in the $H(P)$, we could have 
+\begin{align*}
+H(P) =& \sum _{x \in \{1, ..., 6\}} - P(x) \ln P(x) \\
+ = & - (\frac{0.2 - p_3}{2})\ln (\frac{0.2 - p_3}{2})  - (\frac{0.2 - p_3}{2})\ln(\frac{0.2 - p_3}{2}) - p_3 \ln p_3  \\
+& - 0.2 \ln 0.2 - (0.6 - p_6) \ln (0.6 - p_6) - p_6 \ln p_6
+\end{align*}
+
+Take gradient of $p_3$, we have
+\begin{align*}
+\nabla_{p_3}H(P) = \ln \frac{0.2 - p_3}{2} - \ln p_3
+\end{align*}
+
+To maximize $H(P)$, we assign $\nabla_{p_3}H(P)$ to be 0, thus we have 
+\begin{align*}
+p3 = \frac {1}{15} \\
+p2 = \frac {1}{15} \\
+p1 = \frac {1}{15}
+\end{align*}
+
+(b) \\ \indent
+Solution : $p_1 =  0.25, p_2 = 0.25,  p_3 = 0.125, p_4 = 0.125 , p_5 = 0.125, p_6 =  0.125$ \\
+According to the problem, we have 
+\begin{align*}
+p_1 + p_2 &= 0.5 \\
+p_2 + p_4 + p_6  &= 0.5 \\
+p_1 + p_3 + p_5 &= 0.5
+\end{align*}
+
+$\implies$ 
+\begin{align*}
+p_2 &= 0.5 - p_1\\
+p_3 &= 0.5 - p_5 - p_1 \\
+p_4 &= p_1 - p_6
+\end{align*}
+
+Thus, we could write the overall entropy $H(P)$ as following form
+\begin{align*}
+H(P) =& \sum _{x \in \{1, ..., 6\}} - P(x) \ln P(x) \\
+ = & - p_1 \ln p_1  - (0.5 - p_1) \ln (0.5 - p_1)- (0.5 - p_5 - p_1 ) \ln (0.5 - p_5 - p_1) \\
+& - (p_1 - p_6) \ln (p_1 - p_6) - p_5 \ln p_5 - p_6 \ln p_6
+\end{align*}
+
+Take gradient of $p_5$, we have 
+\begin{align*}
+\nabla_{p_5}H(P) = \ln(0.5 - p_5 - p_1) - \ln p_5
+\end{align*}
+
+To maximize $H(P)$, we assign $\nabla_{p_5}H(P)$ to be 0, thus we have 
+\begin{align*}
+p_5 = \frac {0.5 - p_1}{ 2}
+\end{align*}
+
+
+Since we have $p_3 = 0.5 - p_5 - p_1$, we could also have 
+\begin{align*}
+p_3 = \frac {0.5 - p_1}{ 2}
+\end{align*}
+
+
+Take gradient of $p_6$, we have 
+\begin{align*}
+\nabla_{p_6}H(P) = \ln(p_1 - p_6) - \ln p_6
+\end{align*}
+
+To maximize $H(P)$, we assign $\nabla_{p_6}H(P)$ to be 0, thus we have 
+\begin{align*}
+p_6 = \frac { p_1}{ 2}
+\end{align*}
+
+Since we have $p_2 = 0.5 - p_1$ and $p_2 + p_4 + p_6 = 0.5$, we could also have 
+\begin{align*}
+p_2 &= 0.5 - p_1 \\
+p_4 &= \frac {p_1}{2}
+\end{align*}
+
+So far, we could replace $p_2, p_3, p_4, p_5, p_6$ in the form of $p_1$, thus we have 
+\begin{align*}
+H(P) =& \sum _{x \in \{1, ..., 6\}} - P(x) \ln P(x) \\
+ = & - p_1 \ln p_1  - (0.5 - p_1) \ln (0.5 - p_1)- 2*\frac{0.5 - p_1}{2} \ln(\frac{0.5 - p_1}{2}) - 2*\frac{p_1}{2}\ln\frac{p_1}{2}
+\end{align*}
+
+Take gradient of $p_1$, we have 
+\begin{align*}
+\nabla_{p_6}H(P) = -\ln{p_1} + \ln (0.5 - p_1) + \ln (\frac{0.5-p_1}{2}) - \ln \frac{p_1}{2}
+\end{align*}
+
+To maximize $H(P)$, we assign $\nabla_{p_1}H(P)$ to be 0, thus we have 
+\begin{align*}
+-\ln{p_1} + \ln (0.5 - p_1) + \ln (\frac{0.5-p_1}{2}) - \ln \frac{p_1}{2} = 0
+\end{align*}
+
+$\implies$ 
+\begin{align*}
+\ln \frac {(0.5 - p_1)^2}{2} = \ln \frac{p_1^2}{2}
+\end{align*}
+
+$\implies$ 
+\begin{align*}
+p_1 = 0.25
+\end{align*}
+
+Plug the $p_1 = 0.25$ into above equations, we could have 
+\begin{align*}
+p_1 = 0.25 \\
+p_2 =  0.25 \\
+p_3 = 0.125 \\
+p_4 =  0.125 \\
+p_5 = 0.125 \\
+p_6 =  0.125
+\end{align*}
+
+
+\end{document} 

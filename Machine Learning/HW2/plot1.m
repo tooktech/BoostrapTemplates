@@ -1,0 +1,10 @@
+figure(1);
+hold on;
+errorbar(sizes, mean(results_bnb,2), std(results_bnb,1,2));
+errorbar(sizes, mean(results_op1,2), std(results_op1,1,2));
+errorbar(sizes, mean(results_op5,2), std(results_op5,1,2));
+errorbar(sizes, mean(results_ap1,2), std(results_ap1,1,2));
+errorbar(sizes, mean(results_ap5,2), std(results_ap5,1,2));
+legend('BNB', 'OP1', 'OP5', 'AP1', 'AP5');
+xlabel('number of training data');
+ylabel('test error');

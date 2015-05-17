@@ -1,0 +1,277 @@
+\documentclass[twoside,11pt]{homework}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{lipsum}
+\usepackage{indentfirst}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{makecell}
+\usepackage{indentfirst}
+\usepackage{bbm, dsfont}
+
+\coursename{COMS 4771 Machine Learning (Spring 2015)} % DON'T CHANGE THIS
+
+\studname{Jingwei Yang}    % YOUR NAME GOES HERE
+\studmail{jy2653@columbia.edu}% YOUR UNI GOES HERE
+\hwNo{3}                   % THE HOMEWORK NUMBER GOES HERE
+\collab{pp2526,yd2300}   % THE UNI'S OF STUDENTS YOU DISCUSSED WITH
+\begin{document}
+\maketitle
+
+\section*{Problem 1}
+\indent
+In order filter out the optimal parameters for the classifier, I have validated  5 * 11 classifiers with different values of $\lambda$ and $h$ on the training set. \\
+\indent
+In the process of selecting optimal parameters, I have used hold-out validation over each classifier. For each validation, I have selected $70\%$ training data as training set and the remained $30\%$ as validation set. The training set and validation set were randomly chosen from the overall training data. 
+In order to achieve the reproducibility and debugging, I follow the advice of Professor  Hsu to fix the random seed for each validation. \\
+The selecting process could be depicted by following pseudocode.\\
+\begin{algorithm}
+\caption{Finding optimal parameters}
+\begin{algorithmic} 
+\STATE $optAccuracy = 0$
+\STATE $seed	=  rng$
+\FOR{each $\lambda$ in $lambdaList$}
+\FOR{each $hRate$ in $hRateList$}
+\STATE [$tempAccuracy$, $h$] = getAccuracy($data$, $labels$, $\lambda$, $hRate$, $seed$)
+\IF {$tempAccuracy > optAccuracy$}
+\STATE $optAccuracy = tempAccuracy$
+\STATE $optLambda = \lambda$
+\STATE $optH = h$;
+\ENDIF
+\ENDFOR
+\ENDFOR
+\STATE return $optLambda, optH$
+\end{algorithmic}
+\end{algorithm}
+
+Below, I list the pairs of parameters and  related validation accuracy. According to the result, when $\lambda = exp(-9)$ and $h = 33.54$, the resulting classifier could have better performance over other classifiers. \\
+\begin{table}[h]
+\caption {Hold-out validation(accuracy) for different classifiers with respective $\lambda$ and $h$} \label{tab:title}
+\centering
+\begin{tabular}{llllll}
+\diaghead{}
+{$h$ }{$\lambda$}&
+\thead{18.98}&\thead{33.54 }&\thead{63.03}&\thead{115.75}&\thead{219.43}\\ 
+	
+1        & 0.6267 & 0.5865 & 0.5778 & 0.5756 & 0.5756 \\
+EXP(-1)  & 0.6267 & 0.5865 & 0.5778 & 0.5756 & 0.5756 \\
+EXP(-2)  & 0.6322 & 0.5919 & 0.5778 & 0.5767 & 0.5756 \\
+EXP(-3)  & 0.7595 & 0.7159 & 0.6256 & 0.5843 & 0.5756 \\
+EXP(-4)  & 0.8879 & 0.8639 & 0.8248 & 0.741  & 0.6191 \\
+EXP(-5)  & 0.9107 & 0.9042 & 0.8792 & 0.8498 & 0.8073 \\
+EXP(-6)  & 0.9173 & 0.914  & 0.9064 & 0.889  & 0.8607 \\
+EXP(-7)  & 0.9325 & 0.9249 & 0.914  & 0.9075 & 0.8966 \\
+EXP(-8)  & 0.9357 & 0.9314 & 0.9096 & 0.9075 & 0.9042 \\
+EXP(-9)  & 0.9336 & 0.9357 & 0.9129 & 0.9053 & 0.8955 \\
+EXP(-10) & 0.9216 & 0.9281 & 0.9053 & 0.8998 & 0.8781
+\end{tabular}
+\end{table}
+
+\indent
+Using $\lambda = exp(-9)$ and $h = 33.54$, I test the classifier on the test data, and have achieved the following result.
+
+\begin{table}[h]
+\caption {Test result} \label{tab:title}
+\centering
+\begin{tabular}{lll}
+                              & Predict -1                  & Predict +1                  \\ \cline{2-3} 
+\multicolumn{1}{l|}{Label -1} & \multicolumn{1}{l|}{0.5846} & \multicolumn{1}{l|}{0.0280} \\ \cline{2-3} 
+\multicolumn{1}{l|}{Label +1} & \multicolumn{1}{l|}{0.0358} & \multicolumn{1}{l|}{0.3516} \\ \cline{2-3} 
+\end{tabular}
+\end{table}
+
+
+
+
+% YOUR SOLUTION GOES HERE
+\section*{Problem 2}
+(a) \indent \\
+
+Since we have
+\begin{align*}
+min_{\pmb w \in R^d} \frac{\lambda}{2}||\pmb w||_2^2 + \frac{1}{|S|}\sum_{(\pmb x, y) \in S}(\langle \pmb w, \pmb x \rangle - y)^2
+\end{align*}
+and the function $f(\pmb w) $ is twice-differentiable, 
+\begin{align*}
+\nabla f(\pmb w) & := \lambda\pmb w + \frac{1}{|S|}\sum_{(\pmb x, y) \in S}2(\langle \pmb w, \pmb x \rangle - y)\pmb x \\
+\nabla^2 f(\pmb w) & := \lambda\mathbb{I} + \frac{2}{|S|}\sum_{(\pmb x, y) \in S} \pmb x \pmb x^T
+\end{align*}
+
+and we have
+\begin{align*}
+\langle \nabla^2 f(\pmb w)\pmb v, \pmb v  \rangle = \lambda\langle \pmb v, \pmb v\rangle + \frac {2}{|S|}\sum_{(\pmb x, y) \in S}\langle \pmb v, \pmb x \rangle ^ 2 \geq 0
+\end{align*}
+Thus the optimization problem is convex.\\
+
+(b) \\ \indent
+From the previous inference, we have: 
+\begin{align*}
+\nabla f(\pmb w ^ {(t)}) = \lambda\pmb w + \frac{1}{|S|}\sum_{(\pmb x, y) \in S}2(\langle \pmb w, \pmb x \rangle - y)\pmb x
+\end{align*}
+\begin{algorithm}
+\caption{The algorithm for solving the optimization problem}
+\begin{algorithmic} 
+\STATE Start with some initial $\pmb w_{(1)} \in \mathbb{R}^d$ \\
+\FOR{t = 1, 2, ... until some stopping condition is satisfied}
+\STATE Compute gradient of $f$ at $\pmb w^{(t)}$ :
+\indent
+	\STATE \hspace{\algorithmicindent}$\pmb\lambda^{t} := \nabla f(\pmb w ^ {(t)})$ 
+\STATE Update: 
+\indent
+	\STATE \hspace{\algorithmicindent}$\pmb w^{(t+1)} := \pmb w^{(t)} - \eta_t\pmb\lambda^{(t)}$;
+\ENDFOR
+\STATE return $\pmb w$
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+(c) \\
+\indent
+The optimization problem is still convex. We can write the constraints $f(w_i)$ in the standard form \\
+\begin{align*}
+f(w_i) = w_i^2 - 1 \leq 0
+\end{align*}
+Since $f(w_i) $ is twice-differentiable, we have
+\\
+\begin{align*}
+\nabla f(w_i) &= 2w_i \\
+\nabla^2 f(w_i) &= 2 > 0
+\end{align*}
+The $f(w_i)$ is convex, thus the optimization problem is still a convex optimization problem. 
+\\
+
+(d) \\
+\indent
+The optimization problem is still convex. We can write the constraints $f(w_i)$ in the standard form\\
+\begin{align*}
+f_1(w_i, w_{i+1} )  &= w_i - w_{i+1} \leq 0\\
+f_2(w_i, w_{i+1} )  &= w_{i+1} - w_i \leq 0\\ 
+\end{align*}
+for $f_1(w_i, w_{i+1} )$, we have \\
+
+\begin{align*}
+\nabla f_1(w_i, w_{i+1} )  &=\begin{bmatrix}
+  1 & -1 
+ \end{bmatrix}\\
+\nabla^2 f_1(w_i, w_{i+1} )  &=
+\begin{bmatrix}
+  0 & 0 \\
+  0 & 0
+ \end{bmatrix}
+\geq \pmb 0
+\end{align*}
+\\
+for $f_2(w_i, w_{i+1} )$, we have \\
+\begin{align*}
+\nabla f_2(w_i, w_{i+1} )  &= \begin{bmatrix}
+  -1 & 0 
+ \end{bmatrix}\\
+\nabla^2 f_1(w_i, w_{i+1} )  &=
+\begin{bmatrix}
+  0 & 0 \\
+  0 & 0
+ \end{bmatrix}
+\geq \pmb 0
+\end{align*}
+Therefore, the problem is still a convex optimization problem.
+
+
+(e) \\ \indent 
+The optimization problem is not convex. We can write the constraints $f(w_i)$  in the standard form\\
+\begin{align*}
+f_1(w_i)  &= w_i^2 - 1 \leq 0\\
+f_2(w_i)  &= 1 - w_i^2 \leq 0\\ 
+\end{align*}
+
+for $f_1(w_i)$, we have \\
+\begin{align*}
+\nabla f_1(w_i)  &= 2 w_i\\
+\nabla^2 f_1(w_i)  &= 2 > 0
+\end{align*}
+\\
+for $f_2(w_i)$, we have \\
+\begin{align*}
+\nabla f_2(w_i)  &= -2 w_i\\
+\nabla^2 f_2(w_i)  &= -2 < 0
+\end{align*}
+
+Since the constraints is not convex, the optimization problem is not convex. 
+
+
+
+% YOUR SOLUTION GOES HERE
+\section*{Problem 3}
+(a) \indent \\ \indent
+Suppose $(\pmb x, y)$ is randomly picked from the distribution $P$, and $err(f^*)$ is the probability that classifier $err(f^*)$ would wrongly classify $(\pmb x, y)$. Since the size of the sample is $|A|$, the algorithm must meet the condition $Prb(err(f^*, A) =0)$ to return the classifier. Thus, we could have following inference: \\
+\begin{center}
+$Prb(err(f^*, A) = 0) = (1-err(f^*))^{|A|} \leq e^ {-err(f^*)|A|}\leq e^{-\epsilon |A|} $
+\end{center}
+As proved above, the bound is decrease exponentially with $|A|$. \\
+
+(b) \indent \\ \indent
+Given \\
+\begin{center}
+$|S| > \frac{ln(|F|/\delta)}{\epsilon}$\\
+\end{center}
+\indent
+To prove $Prb[\forall f \in \mathcal{F}: err(f,|S|) = 0 \Rightarrow err(f) \leq \epsilon] \geq 1-\delta$ is equal to prove $Prb[\forall f \in  \mathcal{F}: err(f,|A|) = 0 \Rightarrow err(f) > \epsilon] < \delta$. Thus we could have following inference. \\
+\begin{align*}
+Prb[\forall f \in  \mathcal{F}: err(f,|S|) = 0 \Rightarrow err(f) > \epsilon] &= Prb[\forall f \in \mathcal{F}: err(f,|S|) = 0  \wedge err(f) > \epsilon] \\
+&\leq \sum_{i=1}^{|\mathcal{F}|}e^{-\epsilon |S|} \\
+&\leq|\mathcal{F}|e^{-\epsilon |S|}
+\end{align*}
+
+Since we have $|S| > \frac{ln(|\mathcal{F}|/\delta)}{\epsilon}$, we could have\\
+\begin{align*}
+Prb[\forall f \in  \mathcal{F}: err(f,|A|) = 0 \Rightarrow err(f) > \epsilon] \leq |\mathcal{F}|e^{-\epsilon |S|} <  |\mathcal{F}|e^{-\epsilon\frac{ln(|\mathcal{F}|/\delta)}{\epsilon}} = \delta
+\end{align*}
+Thus, we have proved desired claim through its complementary case. 
+\\
+
+(c) \indent \\ \indent
+Since we have training examples from different but independent distributions, the algorithm could return a classifier when $Prb(err(f, S)) = 0$. \\
+\begin{align*}
+Prb(err(f, S) = 0) = \prod_{i=1}^{n}{(1-err_i(f))} \leq \prod_{i=1}^{n}e^{-err_i(f)} = e^{\sum_{i=1}^{n}{-err_i(f)}}
+\end{align*}
+Since $P$ is the uniform mixture of $P_1, P_2, ..., P_n$, we also have \\
+\begin{align*}
+err(f) = \frac{1}{n} {\sum_{i=1}^{n}{err_i(f)}}
+\end{align*}
+Thus we could have 
+\begin{align*}
+Prb(err(f, S) = 0) \leq e^{-err(f)|S|}
+\end{align*}
+Then we could use the same inference route in part b to prove the the claim. 
+\\
+(d) \indent \\ \indent
+Since the overall failure rate is $\delta$ and $\sum_{t=1}^{\infty}\frac{1}{t(t+1)} \leq 1$, rather than split the $\delta$ equally among the the classifier among $f_1, f_2, f_3, ...$, we assign classifier $f_t$ with the error bound\\
+\begin{align*}
+\delta_{t}= \frac {\delta}{t(t+1)}
+\end{align*}
+\\
+Then we can mimic the inference on the $11_{th}$ page of slides 12 : Introduction to Learning theory.
+Apply to events $\epsilon_f$ for $f \in \mathcal{F}$ given by 
+\begin{align*}
+\epsilon_f = \{err(f) > \mbox{err}(f,S) + \sqrt{\frac{2\mbox{err}(f,S)\ln(t(t+1)/\delta)}{|S|}} + \frac{2\ln(t(t+1)/\delta)}{|S|} \}
+\end{align*}
+Therefore, use union bound, we could have
+\begin{align*}
+Prb[\forall f \in  \mathcal{F} .err(f) \leq \mbox{err}(f,S) + \sqrt{\frac{2\mbox{err}(f,S)\ln(t(t+1)/\delta)}{|S|}} + \frac{2\ln(t(t+1)/\delta)}{|S|} ] \geq 1 - \delta
+\end{align*}
+Since the Consistent Classifier Algorithm return $\hat{f} \in \mathcal{F} $, we know that\\
+\begin{align*}
+Prb[err(\hat{f}) \leq \mbox{err}(\hat{f},S) + \sqrt{\frac{2\mbox{err}(\hat{f},S)\ln(t(t+1)/\delta)}{|S|}} + \frac{2\ln(t(t+1)/\delta)}{|S|} ] \geq 1 - \delta
+\end{align*}
+By definition of $\hat{f}, \mbox{err}(\hat{f},S) = 0$, and therefore\\
+\begin{align*}
+Prb[err(\hat{f}) \leq \frac{2\ln(t(t+1)/\delta)}{|S|} ] \geq 1 - \delta
+\end{align*}
+
+
+
+
+
+
+\end{document} 

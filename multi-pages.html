@@ -1,0 +1,539 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>We Deliver</title>
+    <meta name="generator" content="Bootply" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <link href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css" rel="stylesheet" media="screen">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+
+    <!--pie chart partition-->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script src="http://cdn.oesmith.co.uk/morris-0.4.1.min.js"></script>
+
+
+
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--<link href="css/styles.css" rel="stylesheet"> -->
+</head>
+
+
+<body>
+<!-- Button trigger modal -->
+<!--
+<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+  Launch demo modal
+</button>
+-->
+<script>
+function showChart() {
+  document.getElementById("chartPanel").style.display='block';
+  document.getElementById("negativeTweetsPanel").style.display='none';
+  document.getElementById("positiveTweetsPanel").style.display='none';
+  return false;
+}
+
+function showNegativeTweets() {
+  document.getElementById("negativeTweetsPanel").style.display='block';
+  document.getElementById("chartPanel").style.display='none';
+  document.getElementById("positiveTweetsPanel").style.display='none';
+  return false;
+}
+
+
+function showPositiveTweets() {
+  document.getElementById("positiveTweetsPanel").style.display='block';
+  document.getElementById("chartPanel").style.display='none';
+  document.getElementById("negativeTweetsPanel").style.display='none';
+  return false;
+}
+
+</script>
+
+
+<div class="container">
+    <div class = "row">
+    <input id = "key_word" type = "text" name = "Key Word">
+    <button id="search">Search</button>
+
+    <button id="query_latest_tweet">Query Latest Tweets</button>
+
+    <button onclick = "showChart()">show Chart</button>
+    <button onclick = "showNegativeTweets()">show Negative Tweeets</button>
+    <button onclick = "showPositiveTweets()">show Positive Tweeets</button>
+
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<!--Chart Part-->
+<div id = "chartPanel">
+           <div class="container">
+             <div class="section-heading inverse scrollpoint sp-effect3">
+                <h1>Public Overall Emotion</h1>
+                <div class="divider"></div>
+            </div>
+
+
+
+                <div class="row">
+
+                <div class="col-md-2 col-sm-2 col-xs-2">
+                </div>
+
+
+                    <div class="col-md-8 col-sm-8 col-xs-8">
+                        <div class="panel panel-default" style = "background-color: rgba(255, 255, 255, 0.4);">
+                        <div class="panel-heading">
+                            Overall Sentiments
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div id="donut-example"></div>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+
+                    </div>
+
+                <div class="col-md-2 col-sm-2 col-xs-2">
+                </div>
+                </div>
+            </div>
+</div>
+    
+    
+
+<!-- Negative Tweets Panel -->
+<div id = "negativeTweetsPanel">
+    <div id = "negative_tweets_container" class="container">
+    </div>
+</div>
+
+
+<!-- Positive Tweets Panel -->
+<div id = "positiveTweetsPanel">
+    <div id = "positive_tweets_container" class="container">
+    </div>
+</div>
+
+
+
+    <!--This part is for pie chart script-->
+    <script>
+        window.Morris.Donut.prototype.setData = function(data, redraw) {
+            if (redraw == null) {
+                redraw = true;
+            }
+            this.data = data;
+            this.values = (function() {
+                var _i, _len, _ref, _results;
+                _ref = this.data;
+                _results = [];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                    row = _ref[_i];
+                    _results.push(parseFloat(row.value));
+                }
+                return _results;
+            }).call(this);
+            this.dirty = true;
+            if (redraw) {
+                return this.redraw();
+            }
+        }
+
+        var donut = Morris.Donut({
+            element: 'donut-example',
+            data: [{
+                label: "Positive",
+                value: 0
+            }, {
+                label: "Neutral",
+                value: 0
+            }, {
+                label: "Negative",
+                value: 0
+            }],
+            colors: ["#009900", "#CCCCCC", "#FF3300"]
+        });
+
+        $('#btn1').on('click', function() {
+            donut.setData(update_data);
+        });
+
+
+        function updateOverallEmotionChart() {
+            var update_data = [{
+                label: "Positive",
+                value: positive_count
+            }, {
+                label: "Neutral",
+                value: neutural_count
+            }, {
+                label: "Negative",
+                value: negative_count
+            }];
+
+            donut.setData(update_data);
+        }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+//total count for each kind of tweets: positive, neutrual, negative
+var positive_count = 0;
+var neutural_count = 0;
+var negative_count = 0;
+//total count of the modal windows were created up to now
+var relpy_modal_count = 0;
+
+
+$('#search').on('click', function() {
+
+    resetEnvironment();
+
+      var key_word = $("#key_word").val();
+
+        alert(key_word);
+       $.ajax({
+        method: "POST",
+        url: "http://localhost:8080/trackingEmotion/responder",
+        data: {
+            send_key_word: key_word,
+        },
+        dataType: "html"
+        })
+        .done(function(msg) {
+                //no latest tweet concerning the search topic
+
+            if (msg === "failure") { 
+                    alert("Send failure!");
+                } else {
+                    //alert("Data Received Saved: " + msg);
+                    //processLatestTweet(msg);
+                    alert("Sucessfully send!")
+                  }
+            });
+    });
+
+
+//When the search button was clicked, we should clear all divs and reset all global varialbes corresponding the previous search 
+function resetEnvironment() {
+    neutural_count = 0;
+    negative_count = 0;
+    positive_count = 0;
+
+    $('#negative_tweets_container').empty();
+    $('#positive_tweets_container').empty();
+
+    var zero_data = [{
+        label: "Positive",
+        value: 0
+    }, {
+        label: "Neutral",
+        value: 0
+    }, {
+        label: "Negative",
+        value: 0
+    }];
+
+    donut.setData(zero_data);
+}
+
+
+
+
+    
+function send(clicked_id) {
+    var uni = clicked_id;
+    uni = "textarea#"+uni;
+    //alert($(uni).val());
+
+    var uniqueID = clicked_id;
+    var reply_text = $(uni).val();
+
+
+    $.ajax({
+        method: "POST",
+        url: "http://localhost:8080/trackingEmotion/ReplyTweet",
+        data: {
+            send_ID: uniqueID,
+            send_text: reply_text,
+        },
+        dataType: "html"
+        })
+        .done(function(msg) {
+                //no latest tweet concerning the search topic
+
+            if (msg === "failure") { 
+                    alert("Send failure!");
+                } else {
+                    //alert("Data Received Saved: " + msg);
+                    //processLatestTweet(msg);
+                    alert("Sucessfully send!")
+                  }
+            });
+
+}
+</script>
+
+
+
+
+<script>
+    function addWindows(status_id, screen_name) {
+        relpy_modal_count = relpy_modal_count + 1;
+        uniqueID = getUniqueID(status_id, screen_name);
+        str_tweet_window = getTweetWindowString(uniqueID);
+        str_modal_window = getModalWindowString(uniqueID);
+    }
+
+    function getUniqueID(status_id, screen_name) {
+        return status_id + "-" + screen_name;
+    }
+
+  </script>
+
+
+
+
+
+<!--This part is for updating new tweets and change panel-->
+<script>
+    function getLatestTweet() {
+
+         $.ajax({
+                method: "POST",
+                url: "http://localhost:8080/trackingEmotion/GetLatestTweets",
+                data: {
+                    name: "John",
+                    location: "Boston"
+                },
+                dataType: "html"
+            })
+            .done(function(msg) {
+                //no latest tweet concerning the search topic
+                if (msg === "null") { 
+                    //alert("null");
+                } else {
+                    //alert("Data Received Saved: " + msg);
+                    processLatestTweet(msg);
+                }
+            });
+    }
+
+
+
+
+
+
+
+    //this function should update related html element!
+    function processLatestTweet(tweetjson) {
+        //alert("the passed in tweetjson" + tweetjson);
+        obj = JSON.parse(tweetjson);
+        //get all attributes from the passed in Json object.
+        status_id = String(obj.status_id);
+        screen_name = String(obj.screen_name);
+        text = String(obj.text);
+        create_time = String(obj.create_time);
+        retweet_count = String(obj.retweet_count);
+        image_url = String(obj.image_url);
+
+        sentiment_value = String(obj.sentiment_value);
+
+
+
+        var temp_ID = getUniqueID(status_id, screen_name);
+        var strModal = getModalWindowString(temp_ID);
+        var strTweet = getTweetWindowString(temp_ID, text, create_time, retweet_count, image_url);
+        relpy_modal_count += 1;
+
+        //update modal count for each new passed in tweet. since we only display negative tweets, we only add the count for negative tweet.
+        if (sentiment_value === "-1") {
+            negative_count += 1;
+            $('#negative_tweets_container').append(strTweet);
+            $('#negative_tweets_container').append(strModal); 
+        
+        } else if (sentiment_value === "1"){
+            positive_count += 1;
+            $('#positive_tweets_container').append(strTweet);
+            $('#positive_tweets_container').append(strModal); 
+
+        } else {
+            neutural_count += 1;
+        }
+
+        updateOverallEmotionChart();
+
+    }
+
+
+
+
+
+function getTweetWindowString(uniqueID, text, create_time, retweet_count, image_url) {
+
+      var strTweet="";
+strTweet += "<div class=\"row\">";
+strTweet += "            <div clss=\"col-sm-2\">";
+strTweet += "            <\/div>";
+strTweet += "            <div class=\"col-sm-8 col-sm-offset-2\">";
+strTweet += "                <div class=\"[ panel panel-default ] panel-google-plus\">";
+strTweet += "                    <div class=\"panel-heading\">";
+strTweet += "                        <img class=\"[ img-circle pull-left ]\"src=\""; 
+strTweet += image_url;
+strTweet += "\" \/>";
+strTweet += "                        <h3>";
+strTweet += screen_name;
+strTweet += "<\/h3>";
+strTweet += "                        <h5><span>Shared publicly<\/span> - <span>";
+strTweet += create_time;
+strTweet += "<\/span> <\/h5>";
+strTweet += "                    <\/div>";
+strTweet += "                    <div class=\"panel-body\" style=\"padding-bottom: 5px;\">";
+strTweet += "                        <p>";
+strTweet += text;
+strTweet += "<\/p>";
+strTweet += "                    <\/div>";
+strTweet += "                    <div class=\"panel-footer\">";
+strTweet += "                        <button type=\"button\" class=\"[ btn btn-default ]\">";
+strTweet += retweet_count;
+strTweet += "<\/button>";
+strTweet += "                        <button type=\"button\" class=\"[ btn btn-default ]\" class=\"btn btn-primary btn-lg\" data-toggle=\"modal\" data-target=\"";
+strTweet += "#" + "modal" + relpy_modal_count.toString();
+strTweet += "\"> ";
+strTweet += "                            <span class=\"[ glyphicon glyphicon-share-alt ]\"><\/span>";
+strTweet += "                        <\/button>";
+strTweet += "                    <\/div> ";
+strTweet += "                <\/div>";
+strTweet += "            <\/div>";
+strTweet += "            <div clss=\"col-sm-2\">";
+strTweet += "            <\/div>";
+strTweet += "    <\/div>";
+
+
+
+    return strTweet;
+    }
+
+
+
+
+
+
+
+function getModalWindowString(uniqueID) {
+
+var strModal="";
+strModal += "<div class=\"modal fade\" id=\""
+strModal += "modal" + relpy_modal_count.toString();
+strModal += "\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\" aria-hidden=\"true\">";
+strModal += "  <div class=\"modal-dialog\">";
+strModal += "    <form id = \"form_1\">";
+strModal += "    <div class=\"modal-content\">";
+strModal += "      <div class=\"modal-header\">";
+strModal += "        <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;<\/span><\/button>";
+strModal += "        <h4 class=\"modal-title\" id=\"myModalLabel\">Reply Text<\/h4>";
+strModal += "      <\/div>";
+strModal += "      <div class=\"modal-body\">";
+strModal += "        <textarea class=\"form-control\" rows=\"3\" id = \"";
+strModal += uniqueID;
+strModal += "\"><\/textarea>";
+strModal += "      <\/div>";
+strModal += "      <div class=\"modal-footer\">";
+strModal += "        <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close<\/button>";
+strModal += "          <button type=\"button\" class=\"btn btn-default\" id=\"";
+strModal += uniqueID;
+strModal += "\" onClick = \"send(this.id)\">Send<\/button>";
+strModal += "      <\/div>";
+strModal += "    <\/div>";
+strModal += "  <\/form>";
+strModal += "  <\/div>";
+strModal += "<\/div>"; 
+
+
+return strModal;
+    }
+
+
+
+
+    //this function is responsible for calling GetLatestTweets
+    function myfunction() {
+        
+        getLatestTweet();
+        //alert("enter my function");
+            setInterval(function() {
+            //alert("enter break1");
+                getLatestTweet();
+            }, 1000 * 1) //call the GetLatestTweets Servlet every 5 seconds
+    }
+
+
+
+    $(document).ready(function() {
+        $("#btn_json").click(function() {
+            $.getJSON("GetLatestTweets", function(result) {
+                $.each(result, function(i, field) {
+                    $("div").append(field + " ");
+                });
+            });
+        });
+    });
+
+
+
+
+    $('#query_latest_tweet').on('click', function() {
+        myfunction();
+    });
+</script>
+
+
+</body>
+
+
+
+
+
+

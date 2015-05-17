@@ -1,0 +1,224 @@
+AVC 20 
+
+NEW2: bnb
+words = 
+
+    'windows'
+    'graphics'
+    'window'
+    'motif'
+    'image'
+    'key'
+    'space'
+    'win'
+    'moon'
+    'encryption'
+    'circuit'
+    'format'
+    'file'
+    'government'
+    'server'
+    'power'
+    'large'
+    'mouse'
+    'low'
+    'version'
+
+
+weights =
+
+  -25.1524
+  -19.8811
+  -14.4926
+  -14.2956
+  -13.3405
+   12.4873
+   11.9605
+  -11.9320
+   11.8423
+   11.1987
+   11.1708
+  -10.6489
+  -10.5748
+   10.4239
+  -10.0757
+   10.0752
+    9.9933
+   -9.9714
+    9.9362
+   -9.8288
+
+
+
+NEW3: bnb
+
+words = 
+
+    'athos'
+    'atheism'
+    'atheists'
+    'clh'
+    'firearms'
+    'occupied'
+    'teachings'
+    'israelis'
+    'serdar'
+    'argic'
+    'ohanus'
+    'appressian'
+    'sahak'
+    'melkonian'
+    'villages'
+    'revelation'
+    'testament'
+    'livesey'
+    'atheist'
+    'solntze'
+
+
+weights =
+
+    5.1816
+    4.7957
+    4.7642
+    4.7318
+   -4.6845
+   -4.5487
+    4.4191
+   -4.4071
+   -4.3944
+   -4.3944
+   -4.2302
+   -4.2302
+   -4.2302
+   -4.2302
+   -4.2154
+    4.2136
+    4.1783
+    4.1602
+    4.1526
+    4.1231
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NEW2:
+words = 
+
+    'god'
+    'jesus'
+    'christian'
+    'gun'
+    'bible'
+    'christians'
+    'keith'
+    'american'
+    'israel'
+    'government'
+    'clh'
+    'atheism'
+    'april'
+    'athos'
+    'lord'
+    'news'
+    'james'
+    'religious'
+    'kent'
+    'amendment'
+
+
+weights =
+
+  -21.7711
+  -18.4720
+  -18.1406
+   15.4042
+  -15.3759
+  -14.5415
+  -14.3694
+   13.3989
+   13.0465
+   12.7633
+  -12.3217
+  -11.9379
+   11.4819
+  -11.4675
+  -11.2899
+   11.1809
+  -10.8314
+  -10.7604
+  -10.7436
+   10.6447
+
+
+
+
+
+
+NEW3:
+
+
+words = 
+
+    'god'
+    'jesus'
+    'christian'
+    'gun'
+    'bible'
+    'christians'
+    'keith'
+    'american'
+    'israel'
+    'government'
+    'clh'
+    'atheism'
+    'april'
+    'athos'
+    'lord'
+    'news'
+    'james'
+    'religious'
+    'kent'
+    'amendment'
+
+
+weights =
+
+  -21.7711
+  -18.4720
+  -18.1406
+   15.4042
+  -15.3759
+  -14.5415
+  -14.3694
+   13.3989
+   13.0465
+   12.7633
+  -12.3217
+  -11.9379
+   11.4819
+  -11.4675
+  -11.2899
+   11.1809
+
